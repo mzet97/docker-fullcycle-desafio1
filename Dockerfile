@@ -1,9 +1,13 @@
-FROM golang:alpine
+FROM golang:1.21-alpine as builder
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY main.go .
+COPY . .
 
-RUN go build -o main main.go
+RUN CGO_ENABLED=0 go build -o /usr/local/bin/app main.go
 
-CMD ["./main"]
+FROM scratch
+
+COPY --from=builder /usr/local/bin/app /usr/local/bin/app
+
+CMD ["./usr/local/bin/app"]
